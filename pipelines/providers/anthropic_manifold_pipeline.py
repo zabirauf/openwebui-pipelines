@@ -175,8 +175,11 @@ class Pipeline:
             if thinking_enabled:
                 payload["thinking"] = {"type": "enabled", "budget_tokens": thinking_budget}
 
-                # When thinking is enabled only temperature 1.0 is supported
+                # When thinking is enabled, unset top_k and top_p parameters
+                # as they're not compatible with thinking mode and set temperature to 1.0
                 payload["temperature"] = 1.0
+                del payload["top_k"]
+                del payload["top_p"]
                 
                 # Ensure max_tokens is greater than thinking budget
                 if payload["max_tokens"] <= thinking_budget:
