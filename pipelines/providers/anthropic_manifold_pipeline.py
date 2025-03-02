@@ -174,6 +174,10 @@ class Pipeline:
             # Add thinking parameters if enabled
             if thinking_enabled:
                 payload["thinking"] = {"type": "enabled", "budget_tokens": thinking_budget}
+
+                # When thinking is enabled only temperature 1.0 is supported
+                payload["temperature"] = 1.0
+                
                 # Ensure max_tokens is greater than thinking budget
                 if payload["max_tokens"] <= thinking_budget:
                     payload["max_tokens"] = thinking_budget + 1000  # Add a buffer
