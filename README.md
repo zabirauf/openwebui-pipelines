@@ -22,7 +22,7 @@ The pipeline supports sending up to 5 images per API call, with a total size lim
 
 #### Thinking Tag (claude-3.7-sonnet only)
 
-The claude-3.7-sonnet model supports a special "thinking" mode that allows the model to show its reasoning process. This can be activated using the `<think>` tag in beginning of message (default thinking budget 16,000) or `<think:{budget_tokens}>` to set custom budget tokens.
+The claude-3.7-sonnet model supports a special "thinking" mode that allows the model to show its reasoning process. This can be activated using the `<think>` or `[think]` tag in beginning of message (default thinking budget 16,000) or `<think:{budget_tokens}>` or `[think:{budget_tokens}]` to set custom budget tokens.
 
 ## Fireworks Manifold Pipeline
 

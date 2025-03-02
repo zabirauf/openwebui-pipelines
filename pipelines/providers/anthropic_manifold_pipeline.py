@@ -101,8 +101,8 @@ class Pipeline:
             if model_id == "claude-3-7-sonnet-20250219" and user_message:
                 import re
                 
-                # Check for <think> tag with or without budget parameter
-                think_pattern = r'^<think(?::(\d+))?>(.*)$'
+                # Check for <think> or [think] tag with or without budget parameter
+                think_pattern = r'^(?:<|\[)think(?::(\d+))?(?:>|\])(.*)$'
                 match = re.match(think_pattern, user_message, re.DOTALL)
                 
                 if match:
