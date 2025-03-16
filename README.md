@@ -7,12 +7,14 @@ The Anthropic Manifold Pipeline provides access to Claude 3 models through the A
 ### Environment Variables
 
 - `ANTHROPIC_API_KEY`: Your Anthropic API key (required)
+- `THINKING_BUDGET`: Number of tokens allocated for thinking capabilities (default: 16000)
 
 ### Available Models
 
 - claude-3.5-haiku
 - claude-3.5-sonnet  
 - claude-3.7-sonnet
+- claude-3.7-sonnet-think (special variant with thinking always enabled)
 
 ### Special Features
 
@@ -20,9 +22,11 @@ The Anthropic Manifold Pipeline provides access to Claude 3 models through the A
 
 The pipeline supports sending up to 5 images per API call, with a total size limit of 100MB. Images can be provided as either base64-encoded data or URLs.
 
-#### Thinking Tag (claude-3.7-sonnet only)
+#### Thinking Mode (claude-3.7-sonnet-think)
 
-The claude-3.7-sonnet model supports a special "thinking" mode that allows the model to show its reasoning process. This can be activated using the `<think>` or `[think]` tag in beginning of message (default thinking budget 16,000) or `<think:{budget_tokens}>` or `[think:{budget_tokens}]` to set custom budget tokens.
+The pipeline provides a special model variant `claude-3.7-sonnet-think` that automatically enables the thinking capability. This model shows the AI's reasoning process before producing an answer.
+
+The thinking budget (number of tokens allocated for thinking) can be configured through the `THINKING_BUDGET` environment variable.
 
 ## Fireworks Manifold Pipeline
 

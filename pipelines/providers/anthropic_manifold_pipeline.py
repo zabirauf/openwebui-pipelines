@@ -2,7 +2,7 @@
 title: Anthropic Manifold Pipeline
 author: zabirauf
 date: 2025-03-02
-version: 1.0
+version: 1.1
 license: MIT
 description: A pipeline for generating text and processing images using the Anthropic API.
 requirements: requests, sseclient-py
@@ -22,6 +22,7 @@ from utils.pipelines.main import pop_system_message
 class Pipeline:
     class Valves(BaseModel):
         ANTHROPIC_API_KEY: str = ""
+        THINKING_BUDGET: int = 16000  # Default thinking budget
 
     def __init__(self):
         self.type = "manifold"
@@ -29,7 +30,10 @@ class Pipeline:
         self.name = "anthropic/"
 
         self.valves = self.Valves(
-            **{"ANTHROPIC_API_KEY": os.getenv("ANTHROPIC_API_KEY", "your-api-key-here")}
+            **{
+                "ANTHROPIC_API_KEY": os.getenv("ANTHROPIC_API_KEY", "your-api-key-here"),
+                "THINKING_BUDGET": int(os.getenv("THINKING_BUDGET", "16000"))
+            }
         )
         self.url = 'https://api.anthropic.com/v1/messages'
         self.update_headers()
@@ -49,6 +53,7 @@ class Pipeline:
             {"id": "claude-3-5-haiku-20241022", "name": "claude-3.5-haiku"},
             {"id": "claude-3-5-sonnet-20241022", "name": "claude-3.5-sonnet"},
             {"id": "claude-3-7-sonnet-20250219", "name": "claude-3.7-sonnet"},
+            {"id": "claude-3-7-sonnet-think", "name": "claude-3.7-sonnet-think"},
         ]
 
     async def on_startup(self):
@@ -94,27 +99,16 @@ class Pipeline:
             for key in ['user', 'chat_id', 'title']:
                 body.pop(key, None)
 
-            # Process thinking tag for claude-3.7-sonnet
+            # Process thinking for models
             thinking_enabled = False
-            thinking_budget = 16000  # Default value
+            thinking_budget = self.valves.THINKING_BUDGET  # Use value from Valves
             
-            if model_id == "claude-3-7-sonnet-20250219" and user_message:
-                import re
-                
-                # Check for <think> or [think] tag with or without budget parameter
-                think_pattern = r'^(?:<|\[)think(?::(\d+))?(?:>|\])(.*)$'
-                match = re.match(think_pattern, user_message, re.DOTALL)
-                
-                if match:
-                    budget_str, remaining_message = match.groups()
-                    thinking_enabled = True
-                    
-                    # Update the user message to remove the thinking tag
-                    user_message = remaining_message.strip()
-                    
-                    # If budget was specified, use it
-                    if budget_str:
-                        thinking_budget = int(budget_str)
+            # Handle the "think" model variant
+            if model_id == "claude-3-7-sonnet-think":
+                # Always enable thinking for the think model variant
+                thinking_enabled = True
+                # Use the actual model ID for API calls
+                model_id = "claude-3-7-sonnet-20250219"
             
             # Update the user's message in the messages list
             for i, message in enumerate(messages):
